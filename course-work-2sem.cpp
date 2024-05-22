@@ -4,16 +4,16 @@
 
 using namespace std;
 
+// Функция для безопасного чтения строки из ввода
 void safeReadString(char* buffer, int maxLength) {
     cin.get(buffer, maxLength);
     while (cin.get() != '\n') {} // Чтение и игнорирование всех оставшихся символов в строке ввода
 }
 
+// Меню для взаимодействия с пользователем
 void menu(GroupList& groupList) {
-
     SetConsoleCP(1251); // Установка кодировки консоли для ввода
     SetConsoleOutputCP(1251); // Установка кодировки консоли для вывода
-
     int choice;
     do {
         system("cls");
@@ -146,7 +146,7 @@ void menu(GroupList& groupList) {
                 cout << "Список групп пуст!\n";
             }
             else {
-                int groupNumber, studentId;
+                int groupNumber;
 
                 system("cls");
 

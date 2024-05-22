@@ -1,5 +1,6 @@
 #include "student.h"
 
+// Функция для вычисления хэш-значения имени студента
 unsigned int hashStudentName(const char* name) {
     unsigned int hash = 0;
     while (*name) {
@@ -9,6 +10,7 @@ unsigned int hashStudentName(const char* name) {
     return hash;
 }
 
+// Конструктор структуры Student
 Student::Student(int studentId, const char* studentName, const int* studentGrades, float stipend, const char* extra)
     : id(studentId), scholarship(stipend) {
     strncpy_s(name, studentName, MAX_NAME_LENGTH - 1);
@@ -20,25 +22,30 @@ Student::Student(int studentId, const char* studentName, const int* studentGrade
     phoneNumber[PHONE_NUMBER_LENGTH - 1] = '\0';
 }
 
+// Конструктор хэш-таблицы с инициализацией
 StudentHashTable::StudentHashTable(int initialSize)
     : tableSize(initialSize), numElements(0), nextId(1) {
     table = new Student[tableSize]();
     isOccupied = new bool[tableSize]();
 }
 
+// Деструктор для освобождения памяти хэш-таблицы
 StudentHashTable::~StudentHashTable() {
     delete[] table;
     delete[] isOccupied;
 }
 
+// Хэш-функция для вычисления индекса на основе имени студента
 unsigned int StudentHashTable::hashFunction(const char* name) const {
     return hashStudentName(name) % tableSize;
 }
 
+// Линейное пробирование для разрешения коллизий
 int StudentHashTable::linearProbe(int hash, int i) const {
     return (hash + i) % tableSize;
 }
 
+// Функция для добавления студента в хэш-таблицу
 void StudentHashTable::addStudent(const char* name, const int* grades, float stipend, const char* phoneNumber) {
     if (numElements > tableSize * 0.75) {
         resizeTable();
@@ -54,6 +61,7 @@ void StudentHashTable::addStudent(const char* name, const int* grades, float sti
     numElements++;
 }
 
+// Функция для увеличения размера таблицы
 void StudentHashTable::resizeTable() {
     int newSize = tableSize * 2;
     Student* newTable = new Student[newSize]();
@@ -80,6 +88,7 @@ void StudentHashTable::resizeTable() {
     tableSize = newSize;
 }
 
+// Функция для поиска студента по идентификатору
 Student* StudentHashTable::findStudent(int id) const {
     for (int i = 0; i < tableSize; ++i) {
         if (isOccupied[i] && table[i].id == id) {
@@ -89,6 +98,7 @@ Student* StudentHashTable::findStudent(int id) const {
     return nullptr;
 }
 
+// Функция для удаления студента по идентификатору
 void StudentHashTable::removeStudent(int id) {
     for (int i = 0; i < tableSize; ++i) {
         if (isOccupied[i] && table[i].id == id) {
@@ -102,6 +112,7 @@ void StudentHashTable::removeStudent(int id) {
     cout << "Студент с ID " << id << " не найден.\n";
 }
 
+// Функция для удаления всех студентов из таблицы
 void StudentHashTable::removeAllStudents() {
     for (int i = 0; i < tableSize; ++i) {
         isOccupied[i] = false;
@@ -111,6 +122,7 @@ void StudentHashTable::removeAllStudents() {
     nextId = 1;
 }
 
+// Функция для редактирования данных студента
 void StudentHashTable::editStudent(int id, const char* name, const int* grades, float stipend, const char* phoneNumber) {
     Student* student = findStudent(id);
     if (student) {
@@ -129,6 +141,7 @@ void StudentHashTable::editStudent(int id, const char* name, const int* grades, 
     }
 }
 
+// Функция для вычисления общей суммы стипендий
 float StudentHashTable::calculateTotalScholarship() const {
     float total = 0;
     for (int i = 0; i < tableSize; ++i) {
@@ -139,6 +152,7 @@ float StudentHashTable::calculateTotalScholarship() const {
     return total;
 }
 
+// Функция для печати всех студентов
 void StudentHashTable::printAllStudents() const {
     if (isEmpty()) {
         cout << "Список студентов пуст\n";
@@ -159,6 +173,7 @@ void StudentHashTable::printAllStudents() const {
     }
 }
 
+// Функция для сохранения данных таблицы в файл
 void StudentHashTable::saveToFile(ofstream& outFile) const {
     for (int i = 0; i < tableSize; ++i) {
         if (isOccupied[i]) {
@@ -175,6 +190,7 @@ void StudentHashTable::saveToFile(ofstream& outFile) const {
     outFile << "#\n";
 }
 
+// Функция для загрузки данных таблицы из файла
 void StudentHashTable::loadFromFile(ifstream& inFile) {
     char line[MAX_NAME_LENGTH];
     nextId = 1;
@@ -210,6 +226,7 @@ void StudentHashTable::loadFromFile(ifstream& inFile) {
     }
 }
 
+// Функция для проверки, пуста ли таблица
 bool StudentHashTable::isEmpty() const {
     return numElements == 0;
 }

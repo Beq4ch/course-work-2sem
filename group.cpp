@@ -1,27 +1,34 @@
 #include "group.h"
 
+// Конструктор GroupNode с инициализацией номера группы
 GroupNode::GroupNode(int num) : groupNumber(num), next(nullptr), prev(nullptr) {}
 
+// Функция для печати всех студентов группы
 void GroupNode::printStudents() {
     cout << "Группа " << groupNumber << ":\n";
     students.printAllStudents();
 }
 
+// Функция для вычисления общей суммы стипендий в группе
 float GroupNode::calculateTotalScholarship() const {
     return students.calculateTotalScholarship();
 }
 
+// Функция для сохранения данных группы в файл
 void GroupNode::saveToFile(ofstream& outFile) const {
     outFile << groupNumber << "\n";
     students.saveToFile(outFile);
 }
 
+// Функция для загрузки данных группы из файла
 void GroupNode::loadFromFile(ifstream& inFile) {
     students.loadFromFile(inFile);
 }
 
+// Конструктор GroupList по умолчанию
 GroupList::GroupList() : head(nullptr), tail(nullptr) {}
 
+// Функция для добавления новой группы
 void GroupList::addGroup(int groupNumber) {
     GroupNode* newNode = new GroupNode(groupNumber);
     if (tail) {
@@ -34,6 +41,7 @@ void GroupList::addGroup(int groupNumber) {
     tail = newNode;
 }
 
+// Функция для удаления группы по номеру
 void GroupList::removeGroup(int groupNumber) {
     for (GroupNode* current = head; current; current = current->next) {
         if (current->groupNumber == groupNumber) {
@@ -57,6 +65,7 @@ void GroupList::removeGroup(int groupNumber) {
     cout << "Группа с номером " << groupNumber << " не найдена.\n";
 }
 
+// Функция для поиска группы по номеру
 GroupNode* GroupList::findGroup(int groupNumber) const {
     for (GroupNode* current = head; current; current = current->next) {
         if (current->groupNumber == groupNumber) {
@@ -66,6 +75,7 @@ GroupNode* GroupList::findGroup(int groupNumber) const {
     return nullptr;
 }
 
+// Функция для добавления студента в группу
 void GroupList::addStudentToGroup(int groupNumber, const char* studentName, const int* grades, float stipend, const char* phoneNumber) {
     if (GroupNode* group = findGroup(groupNumber)) {
         group->students.addStudent(studentName, grades, stipend, phoneNumber);
@@ -75,6 +85,7 @@ void GroupList::addStudentToGroup(int groupNumber, const char* studentName, cons
     }
 }
 
+// Функция для удаления студента из группы
 void GroupList::removeStudentFromGroup(int groupNumber, int studentId) {
     if (GroupNode* group = findGroup(groupNumber)) {
         group->students.removeStudent(studentId);
@@ -84,6 +95,7 @@ void GroupList::removeStudentFromGroup(int groupNumber, int studentId) {
     }
 }
 
+// Функция для удаления всех студентов из группы
 void GroupList::removeAllStudentsFromGroup(int groupNumber) {
     if (GroupNode* group = findGroup(groupNumber)) {
         group->students.removeAllStudents();
@@ -94,6 +106,7 @@ void GroupList::removeAllStudentsFromGroup(int groupNumber) {
     }
 }
 
+// Функция для удаления всех групп и студентов
 void GroupList::removeAllGroup() {
     GroupNode* current = head;
     while (current != nullptr) {
@@ -105,6 +118,7 @@ void GroupList::removeAllGroup() {
     cout << "Все студенты из группы удалены.\n";
 }
 
+// Функция для редактирования данных студента в группе
 void GroupList::editStudentInGroup(int groupNumber, int studentId, const char* studentName, const int* grades, float stipend, const char* phoneNumber) {
     if (GroupNode* group = findGroup(groupNumber)) {
         group->students.editStudent(studentId, studentName, grades, stipend, phoneNumber);
@@ -114,6 +128,7 @@ void GroupList::editStudentInGroup(int groupNumber, int studentId, const char* s
     }
 }
 
+// Функция для печати номеров всех групп
 void GroupList::printAllGroupNumbers() const {
     cout << "Список всех групп потока:\n";
     for (GroupNode* current = head; current; current = current->next) {
@@ -121,12 +136,14 @@ void GroupList::printAllGroupNumbers() const {
     }
 }
 
+// Функция для печати всех групп и их студентов
 void GroupList::printAllGroups() const {
     for (GroupNode* current = head; current; current = current->next) {
         current->printStudents();
     }
 }
 
+// Функция для вычисления общей суммы стипендий во всех группах
 float GroupList::calculateTotalScholarship() const {
     float total = 0;
     for (GroupNode* current = head; current; current = current->next) {
@@ -135,10 +152,12 @@ float GroupList::calculateTotalScholarship() const {
     return total;
 }
 
+// Функция для проверки, пуст ли список групп
 bool GroupList::isEmpty() const {
     return head == nullptr;
 }
 
+// Функция для печати процента стипендий по каждой группе
 void GroupList::printGroupScholarshipPercentage() const {
     float totalScholarship = calculateTotalScholarship();
     for (GroupNode* current = head; current; current = current->next) {
@@ -148,6 +167,7 @@ void GroupList::printGroupScholarshipPercentage() const {
     }
 }
 
+// Функция для сохранения данных всех групп в файл
 void GroupList::saveToFile(const char* filename) const {
     string fullFilename = filename;
     if (fullFilename.find(".txt") == string::npos) {
@@ -166,6 +186,7 @@ void GroupList::saveToFile(const char* filename) const {
     }
 }
 
+// Функция для загрузки данных всех групп из файла
 void GroupList::loadFromFile(const char* filename) {
     string fullFilename = filename;
     if (fullFilename.find(".txt") == string::npos) {
