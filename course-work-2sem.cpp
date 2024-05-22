@@ -1,258 +1,314 @@
-﻿#include "StudentGroupManagement.h"
-void menu()
-{
-	cout << "1) Добавить группу" << endl;
-	cout << "2) Добавить студента" << endl;
-	cout << "3) Редактировать группу" << endl;
-	cout << "---" << endl;
-	cout << "4) Вывести все группы" << endl;
-	cout << "5) Вывести выбранную группу" << endl;
-	cout << "---" << endl;
-	cout << "6) Добавить группы из файла" << endl;
-	cout << "7) Вывести группы в файла" << endl;
-	cout << "---" << endl;
-	cout << "8) Вывести в алфавитном порядке список той группы, в которой средний балл является максимальным по потоку" << endl;
-	cout << "---" << endl;
-	cout << "0) Выход" << endl;
+﻿#include <iostream>
+#include <windows.h>
+#include "group.h"
+
+using namespace std;
+
+void safeReadString(char* buffer, int maxLength) {
+    cin.get(buffer, maxLength);
+    while (cin.get() != '\n') {} // Чтение и игнорирование всех оставшихся символов в строке ввода
 }
 
-int main()
-{
-	SetConsoleCP(1251); // Для русского языка
-	SetConsoleOutputCP(1251); // Для русского языка
-	Group* head = nullptr;
-	Group* tail = nullptr;
+void menu(GroupList& groupList) {
 
-	int selection; // Переменная для меню
+    SetConsoleCP(1251); // Установка кодировки консоли для ввода
+    SetConsoleOutputCP(1251); // Установка кодировки консоли для вывода
 
-	do {
-		system("cls");
-		menu();
-		cin >> selection;
-		switch (selection) {
-		case 1:
-		{
-			Group* p = addGroup();
-			if (p->head == nullptr) // Создание первой группы
-			{
-				head = p;
-				tail = p;
-				cout << "Группа № " << p->number << " успешно добавлена" << endl;
-				system("pause");
-				break;
-			}
-			if (isGroupDuplicate(head, p)) // Проверка на повторяющуюся группу
-			{
-				cout << "Группа № " << p->number << " уже существует" << endl;
-				system("pause");
-				break;
-			}
-			if (p->number > head->number) // Если вводимое число больше первого эл-та в списке
-			{
-				if (p->number < tail->number) // Если меньше последнего числа в списке возрастания
-				{
-					Group* temp = head;
-					while (temp->next != nullptr) // Идём от начало списка возрастания и ищем место куда должен встать элемент
-					{
-						if (p->number > temp->next->number)// Идём по списку и сравниваем
-							temp = temp->next;
-						else
-						{
-							Group* temp2 = temp->next;
-							temp->next = p;
-							temp = temp->next;
-							temp->next = temp2;
-							break;
-						}
-					}
-				}
-				else //Если число больше предыдущего то просто добавляем его
-				{
-					tail->next = p;
-					tail = tail->next;
-					tail->next = nullptr;
-				}
-			}
-			else // Если число меньше первого эл-та, ставим его в начало
-			{
-				Group* temp = head;
-				head = p;
-				head->next = temp;
-			}
-			cout << "Группа № " << p->number << " успешно добавлена" << endl;
-			system("pause");
-			break;
-		}
-		case 2:
-		{
-			if (isGroupExists(head))
-				addStudent(head);
-			break;
-		}
-		case 3:
-		{
-			if (isGroupExists(head))
-			{
-				Group* edit = selectGroup(head);
-				if (edit == nullptr) // Если выбранная не сущ. группа
-					break;
-				cout << "1) Редактировать студентов" << endl;
-				cout << "0) Удалить группу" << endl;
-				int k;
-				cin >> k;
-				switch (k)
-				{
-				case 0:
-				{
-					cout << "Вы точно хотите удалить группу № " << edit->number << endl;
-					cout << " 1) Да" << endl;
-					cout << " 2) Нет" << endl;
-					int l;	cin >> l;
-					if (l == 2)
-						break;
-					else if (l == 1)
-					{
-						deleteAllStudents(edit); // Удаляем всех студентов в группе
-						if (edit == head) // Изменение первого элемента потока
-						{
-							if (head->next == nullptr) // Проверка ,если группа только одна
-							{
-								delete head;
-								head = nullptr;
-							}
-							else
-							{
-								Group* temp = head->next;
-								delete head;
-								head = temp;
-							}
-						}
-						else if (edit == tail) // Изменение последнего элемента потока
-						{
-							Group* temp = head;
-							while (temp->next != tail)
-								temp = temp->next;
-							delete tail;
-							tail = temp;
-							tail->next = nullptr;
-						}
-					}
-					else
-						break;
-					break;
-				}
-				case 1:
-				{
-					if (edit->head == nullptr)
-					{
-						cout << "В группе нет студентов" << endl;
-						system("pause");
-						break;
-					}
-					editStudent(edit);
-					break;
-				}
-				default:
-					break;
-				}
-			}
-			break;
-		}
-		case 4:
-		{
-			if (isGroupExists(head))
-				printAllGroups(head);
-			break;
-		}
-		case 5:
-		{
-			if (isGroupExists(head))
-				printGroup(head);
-			break;
-		}
-		case 6:
-		{
-			string filename;
-			cout << "Имя файла должно содержать только номер группы(без .txt)" << endl;
-			cout << "Введите название файла:" << endl;
+    int choice;
+    do {
+        system("cls");
+        cout << "\nМеню:\n";
+        cout << "1. Добавить группу\n";
+        cout << "2. Удалить группу\n";
+        cout << "3. Добавить студента в группу\n";
+        cout << "4. Удалить студента из группы\n";
+        cout << "5. Удалить всех студентов группы\n";
+        cout << "6. Удалить все группы\n";
+        cout << "7. Редактировать данные студента\n";
+        cout << "8. Показать студентов группы\n";
+        cout << "9. Показать все группы и студентов\n";
+        cout << "10. Показать проценты стипендии по группам\n";
+        cout << "11. Сохранить данные в файл\n";
+        cout << "12. Загрузить данные из файла\n";
+        cout << "13. Выйти\n";
+        cout << "Выберите пункт: ";
+        cin >> choice;
 
-			cin >> filename;
-			Group* p = new Group;
-			p->number = atoi(filename.c_str());
-			p->head = nullptr;
-			p->next = nullptr;
-			if (head == nullptr) // Создание первой группы
-			{
-				head = p;
-				tail = p;
-				readStudentsFromFile(p, filename);
-				if (p->head == nullptr)
-					break;
-				cout << "Группа № " << p->number << " успешно добавлена" << endl;
-				system("pause");
-				break;
-			}
-			if (isGroupDuplicate(head, p)) // Проверка на повторяющуюся группу
-			{
-				cout << "Группа № " << p->number << " уже существует" << endl;
-				system("pause");
-				delete p;
-				break;
-			}
-			if (p->number > head->number) // Если вводимое число больше первого эл-та в списке
-			{
-				if (p->number < tail->number) // Если меньше последнего числа в списке возрастания
-				{
-					Group* temp = head;
-					while (temp->next != nullptr) // Идём от начало списка возрастания и ищем место куда должен встать элемент
-					{
-						if (p->number > temp->next->number)// Идём по списку и сравниваем
-							temp = temp->next;
-						else
-						{
-							Group* temp2 = temp->next;
-							temp->next = p;
-							temp = temp->next;
-							temp->next = temp2;
-							break;
-						}
-					}
-				}
-				else //Если число больше предыдущего то просто добавляем его
-				{
-					tail->next = p;
-					tail = tail->next;
-					tail->next = nullptr;
-				}
-			}
-			else // Если число меньше первого эл-та, ставим его в начало
-			{
-				Group* temp = head;
-				head = p;
-				head->next = temp;
-			}
-			readStudentsFromFile(p, filename);
-			if (p->head == nullptr)
-				break;
+        switch (choice) {
+        case 1: {
+            int groupNumber;
+            cout << "Введите номер группы: ";
+            cin >> groupNumber;
+            if (groupList.findGroup(groupNumber)) {
+                cout << "Группа с номером " << groupNumber << " уже существует\n";
+            }
+            else {
+                groupList.addGroup(groupNumber);
+                cout << "Группа успешно добавлена\n";
+            }
+            system("pause");
+            break;
+        }
+        case 2: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                system("cls");
+                int groupNumber;
+                groupList.printAllGroupNumbers();
+                cout << "Введите номер группы для удаления: ";
+                cin >> groupNumber;
+                groupList.removeGroup(groupNumber);
+            }
+            system("pause");
+            break;
+        }
+        case 3: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                int groupNumber, grades[NUM_GRADES];
+                char studentName[MAX_NAME_LENGTH];
+                char phoneNumber[PHONE_NUMBER_LENGTH];
+                float stipend;
 
-			cout << "Группа № " << p->number << " успешно добавлена" << endl;
-			system("pause");
-			break;
-		}
-		case 7:
-		{
-			if (isGroupExists(head))
-				writeGroupsToFile(head);
-			break;
-		}
-		case 8:
-		{
-			if (isGroupExists(head))
-				printGroupWithHighestAverage(head);
-			break;
-		}
-		default:
-			break;
-		}
-	} while (selection != 0);
+                system("cls");
+                groupList.printAllGroupNumbers();
+
+                cout << "Введите номер группы: ";
+                cin >> groupNumber;
+                cin.ignore(); // Пропуск символа новой строки
+
+                if (!groupList.findGroup(groupNumber)) {
+                    cout << "Группа с номером " << groupNumber << " не найдена.\n";
+                }
+                else {
+                    cout << "Введите ФИО студента (до 50 символов): ";
+                    safeReadString(studentName, MAX_NAME_LENGTH);
+
+                    cout << "Введите " << NUM_GRADES << " оценок: ";
+                    for (int i = 0; i < NUM_GRADES; ++i) {
+                        cin >> grades[i];
+                    }
+
+                    cout << "Введите размер стипендии: ";
+                    cin >> stipend;
+                    cin.ignore();
+
+                    cout << "Введите номер телефона (в формате +7XXXXXXXXX): ";
+                    safeReadString(phoneNumber, PHONE_NUMBER_LENGTH);
+
+                    groupList.addStudentToGroup(groupNumber, studentName, grades, stipend, phoneNumber);
+                    cout << "Студент успешно добавлен\n";
+                }
+            }
+            system("pause");
+            break;
+        }
+        case 4: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                int groupNumber, studentId;
+
+                system("cls");
+
+                groupList.printAllGroupNumbers();
+
+                cout << "Введите номер группы: ";
+                cin >> groupNumber;
+                cin.ignore(); // Пропуск символа новой строки
+
+                GroupNode* group = groupList.findGroup(groupNumber);
+
+                if (!group) {
+                    cout << "Группа с номером " << groupNumber << " не найдена.\n";
+                }
+                else {
+                    group->printStudents();
+                    if (!(group->students.isEmpty())) {
+                        cout << "Введите идентификационный номер студента: ";
+                        cin >> studentId;
+                        cin.ignore(); // Пропуск символа новой строки
+
+                        groupList.removeStudentFromGroup(groupNumber, studentId);
+                    }
+                }
+            }
+            system("pause");
+            break;
+        }
+        case 5: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                int groupNumber, studentId;
+
+                system("cls");
+
+                groupList.printAllGroupNumbers();
+
+                cout << "Введите номер группы: ";
+                cin >> groupNumber;
+                cin.ignore(); // Пропуск символа новой строки
+
+                GroupNode* group = groupList.findGroup(groupNumber);
+
+                if (!group) {
+                    cout << "Группа с номером " << groupNumber << " не найдена.\n";
+                }
+                else {
+                    group->printStudents();
+                    if (!(group->students.isEmpty())) {
+                        groupList.removeAllStudentsFromGroup(groupNumber);
+                    }
+                }
+            }
+            system("pause");
+            break;
+        }
+        case 6: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                groupList.removeAllGroup();
+            }
+            system("pause");
+            break;
+        }
+        case 7: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                int groupNumber, studentId, grades[NUM_GRADES];
+                char studentName[MAX_NAME_LENGTH];
+                char phoneNumber[PHONE_NUMBER_LENGTH];
+                float stipend;
+
+                system("cls");
+
+                groupList.printAllGroupNumbers();
+
+                cout << "Введите номер группы: ";
+                cin >> groupNumber;
+                cin.ignore(); // Пропуск символа новой строки
+
+                GroupNode* group = groupList.findGroup(groupNumber);
+                if (!group) {
+                    cout << "Группа с номером " << groupNumber << " не найдена.\n";
+                }
+                else {
+                    group->printStudents();
+                    if (!(group->students.isEmpty())) {
+                        cout << "Введите идентификационный номер студента: ";
+                        cin >> studentId;
+                        cin.ignore(); // Пропуск символа новой строки
+
+                        if (!group->students.findStudent(studentId)) {
+                            cout << "Студент с ID " << studentId << " не найден";
+                        }
+
+                        cout << "Введите ФИО студента (до 50 символов): ";
+                        safeReadString(studentName, MAX_NAME_LENGTH);
+
+                        cout << "Введите " << NUM_GRADES << " оценок: ";
+                        for (int i = 0; i < NUM_GRADES; ++i) {
+                            cin >> grades[i];
+                        }
+
+                        cout << "Введите размер стипендии: ";
+                        cin >> stipend;
+                        cin.ignore();
+
+                        cout << "Введите номер телефона (в формате +7XXXXXXXXX): ";
+                        safeReadString(phoneNumber, PHONE_NUMBER_LENGTH);
+
+                        groupList.editStudentInGroup(groupNumber, studentId, studentName, grades, stipend, phoneNumber);
+                    }
+                }
+            }
+            system("pause");
+            break;
+        }
+        case 8:
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                system("cls");
+                groupList.printAllGroupNumbers();
+
+                int groupNumber;
+                cout << "Введите номер группы: ";
+                cin >> groupNumber;
+                cin.ignore(); // Пропуск символа новой строки
+
+                groupList.findGroup(groupNumber)->printStudents();
+            }
+            system("pause");
+            break;
+        case 9:
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                system("cls");
+                groupList.printAllGroups();
+            }
+            system("pause");
+            break;
+        case 10:
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                system("cls");
+                groupList.printGroupScholarshipPercentage();
+            }
+            system("pause");
+            break;
+        case 11: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                char filename[MAX_NAME_LENGTH];
+                cout << "Введите имя файла для сохранения: ";
+                cin.ignore();
+                safeReadString(filename, MAX_NAME_LENGTH);
+                groupList.saveToFile(filename);
+            }
+            system("pause");
+            break;
+        }
+        case 12: {
+            char filename[MAX_NAME_LENGTH];
+            cout << "Введите имя файла для загрузки: ";
+            cin.ignore();
+            safeReadString(filename, MAX_NAME_LENGTH);
+            groupList.loadFromFile(filename);
+            system("pause");
+            break;
+        }
+        case 13:
+            cout << "Выход из программы.\n";
+            break;
+        default:
+            cout << "Неверный ввод, попробуйте снова.\n";
+            break;
+        }
+    } while (choice != 13);
+}
+
+// Основная функция программы
+int main() {
+    GroupList groupList;
+    menu(groupList);
+    return 0;
 }
