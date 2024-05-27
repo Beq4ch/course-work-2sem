@@ -24,63 +24,57 @@ void filterMenu(GroupList& groupList) {
         cout << "Выберите пункт: ";
         cin >> choice;
 
+        char studentName[MAX_NAME_LENGTH];
+        char phoneNumber[PHONE_NUMBER_LENGTH];
+        int grades[NUM_GRADES];
+        float scholarship;
+        int groupNumber;
+
         switch (choice) {
-        case 1: {
-            char studentName[MAX_NAME_LENGTH];
+        case 1:
             cout << "Введите ФИО студента: ";
             cin.ignore();
             safeReadString(studentName, MAX_NAME_LENGTH);
             for (GroupNode* group = groupList.head; group; group = group->next) {
-                group->students.filterStudentsByName(studentName);
+                group->students.filterStudents(studentName);
             }
             system("pause");
             break;
-        }
-        case 2: {
-            char phoneNumber[PHONE_NUMBER_LENGTH];
+        case 2:
             cout << "Введите номер телефона: ";
             cin.ignore();
             safeReadString(phoneNumber, PHONE_NUMBER_LENGTH);
             for (GroupNode* group = groupList.head; group; group = group->next) {
-                group->students.filterStudentsByPhoneNumber(phoneNumber);
+                group->students.filterStudents(nullptr, phoneNumber);
             }
             system("pause");
             break;
-        }
-        case 3: {
-            int grades[NUM_GRADES];
+        case 3:
             cout << "Введите " << NUM_GRADES << " оценок: ";
             for (int i = 0; i < NUM_GRADES; ++i) {
                 cin >> grades[i];
             }
             for (GroupNode* group = groupList.head; group; group = group->next) {
-                group->students.filterStudentsByGrades(grades);
+                group->students.filterStudents(nullptr, nullptr, grades);
             }
             system("pause");
             break;
-        }
-        case 4: {
-            float scholarship;
+        case 4:
             cout << "Введите размер стипендии: ";
             cin >> scholarship;
             for (GroupNode* group = groupList.head; group; group = group->next) {
-                group->students.filterStudentsByScholarship(scholarship);
+                group->students.filterStudents(nullptr, nullptr, nullptr, scholarship);
             }
             system("pause");
             break;
-        }
-        case 5: {
-            int groupNumber;
+        case 5:
             cout << "Введите номер группы: ";
             cin >> groupNumber;
             for (GroupNode* group = groupList.head; group; group = group->next) {
-                if (group->groupNumber == groupNumber) {
-                    group->students.filterStudentsByGroup(groupNumber);
-                }
+                group->students.filterStudents(nullptr, nullptr, nullptr, -1, groupNumber);
             }
             system("pause");
             break;
-        }
         case 6:
             return;
         default:

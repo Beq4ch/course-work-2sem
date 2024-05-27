@@ -137,25 +137,6 @@ void StudentHashTable::removeAllStudents() {
     nextId = 1;
 }
 
-// Функция для редактирования данных студента
-void StudentHashTable::editStudent(int id, const char* name, const int* grades, float stipend, const char* phoneNumber) {
-    Student* student = findStudent(id);
-    if (student) {
-        strncpy_s(student->name, name, MAX_NAME_LENGTH - 1);
-        student->name[MAX_NAME_LENGTH - 1] = '\0';
-        for (int i = 0; i < NUM_GRADES; ++i) {
-            student->grades[i] = grades[i];
-        }
-        student->scholarship = stipend;
-        strncpy_s(student->phoneNumber, phoneNumber, PHONE_NUMBER_LENGTH - 1);
-        student->phoneNumber[PHONE_NUMBER_LENGTH - 1] = '\0';
-        cout << "Данные студента с ID " << id << " обновлены.\n";
-    }
-    else {
-        cout << "Студент с ID " << id << " не найден.\n";
-    }
-}
-
 // Функция для вычисления общей суммы стипендий
 float StudentHashTable::calculateTotalScholarship() const {
     float total = 0;
@@ -211,61 +192,30 @@ void StudentHashTable::saveToFile(ofstream& outFile) const {
     outFile << "#\n";
 }
 
-// Функция для фильтрации студентов по имени
-void StudentHashTable::filterStudentsByName(const char* name) const {
-    for (int i = 0; i < tableSize; ++i) {
-        StudentNode* current = table[i];
-        while (current) {
-            if (strcmp(current->student.name, name) == 0) {
-                cout << "Группа: " << current->student.groupNumber << "\n";
-                cout << "ID: " << current->student.id << "\n";
-                cout << "ФИО: " << current->student.name << "\n";
-                cout << "Оценки: ";
-                for (int j = 0; j < NUM_GRADES; ++j) {
-                    cout << current->student.grades[j] << " ";
-                }
-                cout << "\nСтипендия: " << current->student.scholarship << "\n";
-                cout << "Номер телефона: " << current->student.phoneNumber << "\n";
-                cout << "------------------------\n";
-            }
-            current = current->next;
-        }
-    }
-}
-
-// Функция для фильтрации студентов по номеру телефона
-void StudentHashTable::filterStudentsByPhoneNumber(const char* phoneNumber) const {
-    for (int i = 0; i < tableSize; ++i) {
-        StudentNode* current = table[i];
-        while (current) {
-            if (strcmp(current->student.phoneNumber, phoneNumber) == 0) {
-                cout << "Группа: " << current->student.groupNumber << "\n";
-                cout << "ID: " << current->student.id << "\n";
-                cout << "ФИО: " << current->student.name << "\n";
-                cout << "Оценки: ";
-                for (int j = 0; j < NUM_GRADES; ++j) {
-                    cout << current->student.grades[j] << " ";
-                }
-                cout << "\nСтипендия: " << current->student.scholarship << "\n";
-                cout << "Номер телефона: " << current->student.phoneNumber << "\n";
-                cout << "------------------------\n";
-            }
-            current = current->next;
-        }
-    }
-}
-
-// Функция для фильтрации студентов по оценкам
-void StudentHashTable::filterStudentsByGrades(const int* grades) const {
+void StudentHashTable::filterStudents(const char* name, const char* phoneNumber, const int* grades, float scholarship, int groupNumber) const {
     for (int i = 0; i < tableSize; ++i) {
         StudentNode* current = table[i];
         while (current) {
             bool match = true;
-            for (int j = 0; j < NUM_GRADES; ++j) {
-                if (current->student.grades[j] != grades[j]) {
-                    match = false;
-                    break;
+            if (name && strcmp(current->student.name, name) != 0) {
+                match = false;
+            }
+            if (phoneNumber && strcmp(current->student.phoneNumber, phoneNumber) != 0) {
+                match = false;
+            }
+            if (grades) {
+                for (int j = 0; j < NUM_GRADES; ++j) {
+                    if (current->student.grades[j] != grades[j]) {
+                        match = false;
+                        break;
+                    }
                 }
+            }
+            if (scholarship >= 0 && current->student.scholarship != scholarship) {
+                match = false;
+            }
+            if (groupNumber >= 0 && current->student.groupNumber != groupNumber) {
+                match = false;
             }
             if (match) {
                 cout << "Группа: " << current->student.groupNumber << "\n";
@@ -281,54 +231,6 @@ void StudentHashTable::filterStudentsByGrades(const int* grades) const {
             }
             current = current->next;
         }
-    }
-}
-
-// Функция для фильтрации студентов по стипендии
-void StudentHashTable::filterStudentsByScholarship(float scholarship) const {
-    for (int i = 0; i < tableSize; ++i) {
-        StudentNode* current = table[i];
-        while (current) {
-            if (current->student.scholarship == scholarship) {
-                cout << "Группа: " << current->student.groupNumber << "\n";
-                cout << "ID: " << current->student.id << "\n";
-                cout << "ФИО: " << current->student.name << "\n";
-                cout << "Оценки: ";
-                for (int j = 0; j < NUM_GRADES; ++j) {
-                    cout << current->student.grades[j] << " ";
-                }
-                cout << "\nСтипендия: " << current->student.scholarship << "\n";
-                cout << "Номер телефона: " << current->student.phoneNumber << "\n";
-                cout << "------------------------\n";
-            }
-            current = current->next;
-        }
-    }
-}
-
-// Функция для фильтрации студентов по номеру группы
-void StudentHashTable::filterStudentsByGroup(int groupNumber) const {
-    bool found = false;
-    for (int i = 0; i < tableSize; ++i) {
-        StudentNode* current = table[i];
-        while (current) {
-            if (current->student.groupNumber == groupNumber) {
-                found = true;
-                cout << "ID: " << current->student.id << "\n";
-                cout << "ФИО: " << current->student.name << "\n";
-                cout << "Оценки: ";
-                for (int j = 0; j < NUM_GRADES; ++j) {
-                    cout << current->student.grades[j] << " ";
-                }
-                cout << "\nСтипендия: " << current->student.scholarship << "\n";
-                cout << "Номер телефона: " << current->student.phoneNumber << "\n";
-                cout << "------------------------\n";
-            }
-            current = current->next;
-        }
-    }
-    if (!found) {
-        cout << "Студенты в группе " << groupNumber << " не найдены.\n";
     }
 }
 

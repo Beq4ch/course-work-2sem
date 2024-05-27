@@ -59,9 +59,6 @@ struct StudentHashTable {
     // Функция для удаления студента по идентификатору
     void removeStudent(int id);
 
-    // Функция для редактирования данных студента
-    void editStudent(int id, const char* name, const int* grades, float stipend, const char* phoneNumber);
-
     // Функция для вычисления общей суммы стипендий
     float calculateTotalScholarship() const;
 
@@ -83,12 +80,8 @@ struct StudentHashTable {
     // Функция для увеличения размера таблицы
     void resizeTable();
 
-    // Функции для фильтрации студентов по параметрам
-    void filterStudentsByName(const char* name) const;
-    void filterStudentsByPhoneNumber(const char* phoneNumber) const;
-    void filterStudentsByGrades(const int* grades) const;
-    void filterStudentsByScholarship(float scholarship) const;
-    void filterStudentsByGroup(int groupNumber) const;
+    // Функция для фильтрации студентов по параметрам
+    void filterStudents(const char* name = nullptr, const char* phoneNumber = nullptr, const int* grades = nullptr, float scholarship = -1, int groupNumber = -1) const;
 
     // Добавляем метод для перемещения студента в другую группу
     void moveStudentToGroup(int id, StudentHashTable& newGroupTable, int newGroupNumber);
