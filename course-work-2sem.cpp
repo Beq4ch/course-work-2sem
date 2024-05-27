@@ -178,25 +178,29 @@ void editStudentMenu(GroupList& groupList, int groupNumber, int studentId) {
 }
 
 // Меню для взаимодействия с пользователем
+// Меню для взаимодействия с пользователем
 void menu(GroupList& groupList) {
     SetConsoleCP(1251); // Установка кодировки консоли для ввода
     SetConsoleOutputCP(1251); // Установка кодировки консоли для вывода
     int choice;
     do {
         system("cls");
-        cout << "\nМеню:\n";
+        cout << "\n\tРАБОТА С ГРУППАМИ\n";
         cout << "1. Добавить группу\n";
         cout << "2. Удалить группу\n";
-        cout << "3. Добавить студента в группу\n";
-        cout << "4. Удалить студента из группы\n";
-        cout << "5. Удалить всех студентов группы\n";
-        cout << "6. Удалить все группы\n";
-        cout << "7. Редактировать данные студента\n";
-        cout << "8. Показать все группы и студентов\n";
-        cout << "9. Показать проценты стипендии по группам\n";
-        cout << "10. Сохранить данные в файл\n";
-        cout << "11. Фильтрация студентов\n";
+        cout << "3. Удалить всех студентов группы\n";
+        cout << "4. Показать проценты стипендии по группам\n";
+        cout << "5. Удалить все группы\n";
+        cout << "\n\tРАБОТА СО СТУДЕНТАМИ\n";
+        cout << "6. Добавить студента в группу\n";
+        cout << "7. Удалить студента из группы\n";
+        cout << "8. Редактировать данные студента\n";
+        cout << "9. Показать все группы и студентов\n";
+        cout << "10. Фильтрация студентов\n";
+        cout << "\n\tРАБОТА С ФАЙЛАМИ\n";
+        cout << "11. Сохранить данные в файл\n";
         cout << "12. Загрузить данные из файла\n";
+        cout << "\n\tЗАВЕРШЕНИЕ РАБОТЫ\n";
         cout << "13. Выйти\n";
         cout << "Выберите пункт: ";
         cin >> choice;
@@ -232,6 +236,55 @@ void menu(GroupList& groupList) {
             break;
         }
         case 3: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                int groupNumber;
+
+                system("cls");
+                groupList.printAllGroupNumbers();
+
+                cout << "Введите номер группы: ";
+                cin >> groupNumber;
+                cin.ignore(); // Пропуск символа новой строки
+
+                GroupNode* group = groupList.findGroup(groupNumber);
+
+                if (!group) {
+                    cout << "Группа с номером " << groupNumber << " не найдена.\n";
+                }
+                else {
+                    group->printStudents();
+                    if (!(group->students.isEmpty())) {
+                        groupList.removeAllStudentsFromGroup(groupNumber);
+                    }
+                }
+            }
+            system("pause");
+            break;
+        }
+        case 4:
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                system("cls");
+                groupList.printGroupScholarshipPercentage();
+            }
+            system("pause");
+            break;
+        case 5: {
+            if (groupList.isEmpty()) {
+                cout << "Список групп пуст!\n";
+            }
+            else {
+                groupList.removeAllGroup();
+            }
+            system("pause");
+            break;
+        }
+        case 6: {
             if (groupList.isEmpty()) {
                 cout << "Список групп пуст!\n";
             }
@@ -274,7 +327,7 @@ void menu(GroupList& groupList) {
             system("pause");
             break;
         }
-        case 4: {
+        case 7: {
             if (groupList.isEmpty()) {
                 cout << "Список групп пуст!\n";
             }
@@ -308,47 +361,7 @@ void menu(GroupList& groupList) {
             system("pause");
             break;
         }
-        case 5: {
-            if (groupList.isEmpty()) {
-                cout << "Список групп пуст!\n";
-            }
-            else {
-                int groupNumber;
-
-                system("cls");
-
-                groupList.printAllGroupNumbers();
-
-                cout << "Введите номер группы: ";
-                cin >> groupNumber;
-                cin.ignore(); // Пропуск символа новой строки
-
-                GroupNode* group = groupList.findGroup(groupNumber);
-
-                if (!group) {
-                    cout << "Группа с номером " << groupNumber << " не найдена.\n";
-                }
-                else {
-                    group->printStudents();
-                    if (!(group->students.isEmpty())) {
-                        groupList.removeAllStudentsFromGroup(groupNumber);
-                    }
-                }
-            }
-            system("pause");
-            break;
-        }
-        case 6: {
-            if (groupList.isEmpty()) {
-                cout << "Список групп пуст!\n";
-            }
-            else {
-                groupList.removeAllGroup();
-            }
-            system("pause");
-            break;
-        }
-        case 7: {
+        case 8: {
             if (groupList.isEmpty()) {
                 cout << "Список групп пуст!\n";
             }
@@ -384,7 +397,7 @@ void menu(GroupList& groupList) {
             system("pause");
             break;
         }
-        case 8:
+        case 9:
             if (groupList.isEmpty()) {
                 cout << "Список групп пуст!\n";
             }
@@ -394,26 +407,12 @@ void menu(GroupList& groupList) {
             }
             system("pause");
             break;
-        case 9:
-            if (groupList.isEmpty()) {
-                cout << "Список групп пуст!\n";
-            }
-            else {
-                system("cls");
-                groupList.printGroupScholarshipPercentage();
-            }
-            system("pause");
-            break;
         case 10: {
             if (groupList.isEmpty()) {
                 cout << "Список групп пуст!\n";
             }
             else {
-                char filename[MAX_NAME_LENGTH];
-                cout << "Введите имя файла для сохранения: ";
-                cin.ignore();
-                safeReadString(filename, MAX_NAME_LENGTH);
-                groupList.saveToFile(filename);
+                filterMenu(groupList);
             }
             system("pause");
             break;
@@ -423,7 +422,11 @@ void menu(GroupList& groupList) {
                 cout << "Список групп пуст!\n";
             }
             else {
-                filterMenu(groupList);
+                char filename[MAX_NAME_LENGTH];
+                cout << "Введите имя файла для сохранения: ";
+                cin.ignore();
+                safeReadString(filename, MAX_NAME_LENGTH);
+                groupList.saveToFile(filename);
             }
             system("pause");
             break;
@@ -446,6 +449,7 @@ void menu(GroupList& groupList) {
         }
     } while (choice != 13);
 }
+
 
 // Основная функция программы
 int main() {
