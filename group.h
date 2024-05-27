@@ -23,7 +23,7 @@ struct GroupNode {
     void saveToFile(ofstream& outFile) const;
 
     // Функция для загрузки данных группы из файла
-    void loadFromFile(ifstream& inFile);
+    void loadFromFile(ifstream& inFile, int groupNumber);
 };
 
 // Двусвязный список групп
@@ -51,9 +51,6 @@ struct GroupList {
 
     // Функция для удаления всех групп и студентов
     void removeAllGroup();
-
-    // Функция для редактирования данных студента в группе
-    void editStudentInGroup(int groupNumber, int studentId, const char* studentName, const int* grades, float stipend, const char* phoneNumber);
 
     // Функция для печати номеров всех групп
     void printAllGroupNumbers() const;

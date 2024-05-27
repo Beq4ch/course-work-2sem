@@ -21,8 +21,8 @@ void GroupNode::saveToFile(ofstream& outFile) const {
 }
 
 // Функция для загрузки данных группы из файла
-void GroupNode::loadFromFile(ifstream& inFile) {
-    students.loadFromFile(inFile);
+void GroupNode::loadFromFile(ifstream& inFile, int groupNumber) {
+    students.loadFromFile(inFile, groupNumber);
 }
 
 // Конструктор GroupList по умолчанию
@@ -78,7 +78,7 @@ GroupNode* GroupList::findGroup(int groupNumber) const {
 // Функция для добавления студента в группу
 void GroupList::addStudentToGroup(int groupNumber, const char* studentName, const int* grades, float stipend, const char* phoneNumber) {
     if (GroupNode* group = findGroup(groupNumber)) {
-        group->students.addStudent(studentName, grades, stipend, phoneNumber);
+        group->students.addStudent(studentName, grades, stipend, phoneNumber, groupNumber);
     }
     else {
         cout << "Группа с номером " << groupNumber << " не найдена.\n";
@@ -116,16 +116,6 @@ void GroupList::removeAllGroup() {
     }
     head = tail = nullptr;
     cout << "Все студенты из группы удалены.\n";
-}
-
-// Функция для редактирования данных студента в группе
-void GroupList::editStudentInGroup(int groupNumber, int studentId, const char* studentName, const int* grades, float stipend, const char* phoneNumber) {
-    if (GroupNode* group = findGroup(groupNumber)) {
-        group->students.editStudent(studentId, studentName, grades, stipend, phoneNumber);
-    }
-    else {
-        cout << "Группа с номером " << groupNumber << " не найдена.\n";
-    }
 }
 
 // Функция для печати номеров всех групп
@@ -195,12 +185,11 @@ void GroupList::loadFromFile(const char* filename) {
 
     ifstream inFile(fullFilename);
     if (inFile) {
-        while (true) {
+        removeAllGroup(); // Очистка всех текущих данных перед загрузкой
+        while (!inFile.eof()) {
             int groupNumber;
             inFile >> groupNumber;
-            if (inFile.eof()) {
-                break; // Конец файла
-            }
+            if (inFile.fail()) break; // Проверка на ошибки ввода
             inFile.ignore(); // Пропуск символа новой строки
 
             GroupNode* newGroup = new GroupNode(groupNumber);
@@ -213,7 +202,7 @@ void GroupList::loadFromFile(const char* filename) {
             }
             tail = newGroup;
 
-            newGroup->loadFromFile(inFile);
+            newGroup->loadFromFile(inFile, groupNumber);
         }
         cout << "Данные загружены из файла " << fullFilename << ".\n";
     }
@@ -221,3 +210,4 @@ void GroupList::loadFromFile(const char* filename) {
         cout << "Ошибка при открытии файла " << fullFilename << ".\n";
     }
 }
+

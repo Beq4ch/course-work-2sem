@@ -22,15 +22,24 @@ struct Student {
     int grades[NUM_GRADES]; // Оценки студента
     float scholarship; // Стипендия студента
     char phoneNumber[PHONE_NUMBER_LENGTH]; // Номер телефона студента
+    int groupNumber; // Номер группы студента
 
     // Конструктор с параметрами по умолчанию
-    Student(int studentId = 0, const char* studentName = "", const int* studentGrades = nullptr, float stipend = 0.0, const char* extra = "");
+    Student(int studentId = 0, const char* studentName = "", const int* studentGrades = nullptr, float stipend = 0.0, const char* extra = "", int group = 0);
+};
+
+// Узел связного списка для студентов
+struct StudentNode {
+    Student student;
+    StudentNode* next;
+
+    StudentNode(const Student& stud, StudentNode* nextNode = nullptr)
+        : student(stud), next(nextNode) {}
 };
 
 // Структура хэш-таблицы для хранения студентов
 struct StudentHashTable {
-    Student* table; // Массив студентов
-    bool* isOccupied; // Массив для отслеживания занятых ячеек
+    StudentNode** table; // Массив указателей на узлы
     int tableSize; // Размер таблицы
     int numElements; // Количество элементов в таблице
     int nextId; // Следующий идентификатор для нового студента
@@ -42,7 +51,7 @@ struct StudentHashTable {
     ~StudentHashTable();
 
     // Функция для добавления студента в хэш-таблицу
-    void addStudent(const char* name, const int* grades, float stipend, const char* phoneNumber);
+    void addStudent(const char* name, const int* grades, float stipend, const char* phoneNumber, int groupNumber);
 
     // Функция для поиска студента по идентификатору
     Student* findStudent(int id) const;
@@ -63,7 +72,7 @@ struct StudentHashTable {
     void saveToFile(ofstream& outFile) const;
 
     // Функция для загрузки данных таблицы из файла
-    void loadFromFile(ifstream& inFile);
+    void loadFromFile(ifstream& inFile, int groupNumber);
 
     // Функция для проверки, пуста ли таблица
     bool isEmpty() const;
@@ -74,12 +83,19 @@ struct StudentHashTable {
     // Функция для увеличения размера таблицы
     void resizeTable();
 
+    // Функции для фильтрации студентов по параметрам
+    void filterStudentsByName(const char* name) const;
+    void filterStudentsByPhoneNumber(const char* phoneNumber) const;
+    void filterStudentsByGrades(const int* grades) const;
+    void filterStudentsByScholarship(float scholarship) const;
+    void filterStudentsByGroup(int groupNumber) const;
+
+    // Добавляем метод для перемещения студента в другую группу
+    void moveStudentToGroup(int id, StudentHashTable& newGroupTable, int newGroupNumber);
+
 private:
     // Хэш-функция для вычисления индекса на основе имени студента
     unsigned int hashFunction(const char* name) const;
-
-    // Линейное пробирование для разрешения коллизий
-    int linearProbe(int hash, int i) const;
 };
 
 #endif
