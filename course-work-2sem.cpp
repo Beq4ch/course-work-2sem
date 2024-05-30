@@ -178,7 +178,6 @@ void editStudentMenu(GroupList& groupList, int groupNumber, int studentId) {
 }
 
 // Меню для взаимодействия с пользователем
-// Меню для взаимодействия с пользователем
 void menu(GroupList& groupList) {
     SetConsoleCP(1251); // Установка кодировки консоли для ввода
     SetConsoleOutputCP(1251); // Установка кодировки консоли для вывода
