@@ -1,13 +1,8 @@
 #include "student.h"
 
-// Функция для вычисления хэш-значения имени студента
-unsigned int hashStudentName(const char* name) {
-    unsigned int hash = 0;
-    while (*name) {
-        hash = (hash * 31) + static_cast<unsigned int>(*name);
-        ++name;
-    }
-    return hash;
+// Функция для вычисления хэш-значения идентификатора студента
+unsigned int hashStudentId(int id) {
+    return id * 31;
 }
 
 // Конструктор структуры Student
@@ -22,7 +17,6 @@ Student::Student(int studentId, const char* studentName, const int* studentGrade
     phoneNumber[PHONE_NUMBER_LENGTH - 1] = '\0';
 }
 
-
 // Конструктор хэш-таблицы с инициализацией
 StudentHashTable::StudentHashTable(int initialSize)
     : tableSize(initialSize), numElements(0), nextId(1) {
@@ -35,9 +29,9 @@ StudentHashTable::~StudentHashTable() {
     delete[] table;
 }
 
-// Хэш-функция для вычисления индекса на основе имени студента
-unsigned int StudentHashTable::hashFunction(const char* name) const {
-    return hashStudentName(name) % tableSize;
+// Хэш-функция для вычисления индекса на основе идентификатора студента
+unsigned int StudentHashTable::hashFunction(int id) const {
+    return hashStudentId(id) % tableSize;
 }
 
 // Функция для добавления студента в хэш-таблицу
@@ -45,8 +39,8 @@ void StudentHashTable::addStudent(const char* name, const int* grades, float sti
     if (numElements > tableSize * 0.75) {
         resizeTable();
     }
-    unsigned int hash = hashFunction(name);
     Student newStudent(nextId++, name, grades, stipend, phoneNumber, groupNumber);
+    unsigned int hash = hashFunction(newStudent.id);
     StudentNode* newNode = new StudentNode(newStudent);
 
     if (!table[hash]) {
@@ -70,7 +64,7 @@ void StudentHashTable::resizeTable() {
     for (int i = 0; i < tableSize; ++i) {
         StudentNode* current = table[i];
         while (current) {
-            unsigned int newHash = hashStudentName(current->student.name) % newSize;
+            unsigned int newHash = hashFunction(current->student.id) % newSize;
             StudentNode* next = current->next;
             current->next = newTable[newHash];
             newTable[newHash] = current;
@@ -85,39 +79,37 @@ void StudentHashTable::resizeTable() {
 
 // Функция для поиска студента по идентификатору
 Student* StudentHashTable::findStudent(int id) const {
-    for (int i = 0; i < tableSize; ++i) {
-        StudentNode* current = table[i];
-        while (current) {
-            if (current->student.id == id) {
-                return &current->student;
-            }
-            current = current->next;
+    unsigned int hash = hashFunction(id);
+    StudentNode* current = table[hash];
+    while (current) {
+        if (current->student.id == id) {
+            return &current->student;
         }
+        current = current->next;
     }
     return nullptr;
 }
 
 // Функция для удаления студента по идентификатору
 void StudentHashTable::removeStudent(int id) {
-    for (int i = 0; i < tableSize; ++i) {
-        StudentNode* current = table[i];
-        StudentNode* prev = nullptr;
-        while (current) {
-            if (current->student.id == id) {
-                if (prev) {
-                    prev->next = current->next;
-                }
-                else {
-                    table[i] = current->next;
-                }
-                delete current;
-                numElements--;
-                cout << "Студент с ID " << id << " удален.\n";
-                return;
+    unsigned int hash = hashFunction(id);
+    StudentNode* current = table[hash];
+    StudentNode* prev = nullptr;
+    while (current) {
+        if (current->student.id == id) {
+            if (prev) {
+                prev->next = current->next;
             }
-            prev = current;
-            current = current->next;
+            else {
+                table[hash] = current->next;
+            }
+            delete current;
+            numElements--;
+            cout << "Студент с ID " << id << " удален.\n";
+            return;
         }
+        prev = current;
+        current = current->next;
     }
     cout << "Студент с ID " << id << " не найден.\n";
 }
@@ -234,8 +226,6 @@ void StudentHashTable::filterStudents(const char* name, const char* phoneNumber,
     }
 }
 
-
-
 void StudentHashTable::moveStudentToGroup(int id, StudentHashTable& newGroupTable, int newGroupNumber) {
     Student* student = findStudent(id);
     if (student) {
@@ -249,7 +239,6 @@ void StudentHashTable::moveStudentToGroup(int id, StudentHashTable& newGroupTabl
         cout << "Студент с ID " << id << " не найден.\n";
     }
 }
-
 
 // Функция для загрузки данных таблицы из файла
 void StudentHashTable::loadFromFile(ifstream& inFile, int groupNumber) {
@@ -286,7 +275,6 @@ void StudentHashTable::loadFromFile(ifstream& inFile, int groupNumber) {
         }
     }
 }
-
 
 // Функция для проверки, пуста ли таблица
 bool StudentHashTable::isEmpty() const {

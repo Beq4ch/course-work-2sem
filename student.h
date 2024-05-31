@@ -12,8 +12,8 @@ constexpr int MAX_NAME_LENGTH = 50;
 constexpr int PHONE_NUMBER_LENGTH = 13; // Максимальная длина номера телефона, включая код страны
 constexpr int NUM_GRADES = 5;
 
-// Функция для вычисления хэш-значения имени студента
-unsigned int hashStudentName(const char* name);
+// Функция для вычисления хэш-значения идентификатора студента
+unsigned int hashStudentId(int id);
 
 // Структура для хранения информации о студенте
 struct Student {
@@ -88,7 +88,7 @@ struct StudentHashTable {
 
 private:
     // Хэш-функция для вычисления индекса на основе имени студента
-    unsigned int hashFunction(const char* name) const;
+    unsigned int hashFunction(int id) const;
 };
 
 #endif
