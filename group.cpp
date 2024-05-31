@@ -28,6 +28,10 @@ void GroupNode::loadFromFile(ifstream& inFile, int groupNumber) {
 // Конструктор GroupList по умолчанию
 GroupList::GroupList() : head(nullptr), tail(nullptr) {}
 
+GroupList::~GroupList() {
+    removeAllGroup();
+}
+
 // Функция для добавления новой группы
 void GroupList::addGroup(int groupNumber) {
     GroupNode* newNode = new GroupNode(groupNumber);
