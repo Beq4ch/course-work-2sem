@@ -84,7 +84,8 @@ GroupNode* GroupList::findGroup(int groupNumber) const {
 void GroupList::addStudentToGroup(int groupNumber, const char* studentName, const int* grades, float stipend, const char* phoneNumber) {
     if (GroupNode* group = findGroup(groupNumber)) {
         // Генерация уникального ID
-        int studentId = groupNumber * 10 + group->studentCount + 1;
+        int studentId = stoi(to_string(groupNumber) + to_string(group->students.nextId++));
+        cout << studentId << "= STUDENTID" << endl;
         group->students.addStudent(studentId, studentName, grades, stipend, phoneNumber, groupNumber);
         group->studentCount++;
     }

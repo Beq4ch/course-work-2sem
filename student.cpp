@@ -247,7 +247,6 @@ void StudentHashTable::moveStudentToGroup(int id, StudentHashTable& newGroupTabl
 // Функция для загрузки данных таблицы из файла
 void StudentHashTable::loadFromFile(ifstream& inFile, int groupNumber) {
     char line[MAX_NAME_LENGTH];
-    nextId = 1;
     while (true) {
         inFile.getline(line, MAX_NAME_LENGTH);
         if (strcmp(line, "#") == 0 || inFile.eof()) {
@@ -274,9 +273,6 @@ void StudentHashTable::loadFromFile(ifstream& inFile, int groupNumber) {
         strncpy_s(phoneNumber, line, PHONE_NUMBER_LENGTH);
 
         addStudent(id, studentName, grades, stipend, phoneNumber, groupNumber);
-        if (id >= nextId) {
-            nextId = id + 1;
-        }
     }
 }
 
