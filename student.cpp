@@ -26,7 +26,7 @@ Student::Student(int studentId, const char* studentName, const int* studentGrade
 // Конструктор хэш-таблицы с инициализацией
 StudentHashTable::StudentHashTable(int initialSize)
     : tableSize(initialSize), numElements(0), nextId(1) {
-    table = new StudentNode * [tableSize]();
+    table = new StudentNode*[tableSize]();
 }
 
 // Деструктор для освобождения памяти хэш-таблицы
