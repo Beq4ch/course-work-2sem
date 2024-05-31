@@ -6,6 +6,7 @@
 // Узел для хранения информации о группе студентов
 struct GroupNode {
     int groupNumber; // Номер группы
+    int studentCount; // Количество студентов в группе
     StudentHashTable students; // Хэш-таблица студентов группы
     GroupNode* next; // Указатель на следующий узел в списке
     GroupNode* prev; // Указатель на предыдущий узел в списке

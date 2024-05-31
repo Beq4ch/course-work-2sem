@@ -1,7 +1,7 @@
 #include "group.h"
 
 // Конструктор GroupNode с инициализацией номера группы
-GroupNode::GroupNode(int num) : groupNumber(num), next(nullptr), prev(nullptr) {}
+GroupNode::GroupNode(int num) : groupNumber(num), studentCount(0), next(nullptr), prev(nullptr) {}
 
 // Функция для печати всех студентов группы
 void GroupNode::printStudents() {
@@ -83,7 +83,10 @@ GroupNode* GroupList::findGroup(int groupNumber) const {
 // Функция для добавления студента в группу
 void GroupList::addStudentToGroup(int groupNumber, const char* studentName, const int* grades, float stipend, const char* phoneNumber) {
     if (GroupNode* group = findGroup(groupNumber)) {
-        group->students.addStudent(studentName, grades, stipend, phoneNumber, groupNumber);
+        // Генерация уникального ID
+        int studentId = groupNumber * 10 + group->studentCount + 1;
+        group->students.addStudent(studentId, studentName, grades, stipend, phoneNumber, groupNumber);
+        group->studentCount++;
     }
     else {
         cout << "Группа с номером " << groupNumber << " не найдена.\n";
@@ -120,7 +123,7 @@ void GroupList::removeAllGroup() {
         delete toDelete;
     }
     head = tail = nullptr;
-    cout << "Все студенты из группы удалены.\n";
+    cout << "Все группы удалены.\n";
 }
 
 // Функция для печати номеров всех групп

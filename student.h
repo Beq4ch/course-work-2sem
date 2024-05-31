@@ -51,7 +51,7 @@ struct StudentHashTable {
     ~StudentHashTable();
 
     // Функция для добавления студента в хэш-таблицу
-    void addStudent(const char* name, const int* grades, float stipend, const char* phoneNumber, int groupNumber);
+    void addStudent(int studentId, const char* name, const int* grades, float stipend, const char* phoneNumber, int groupNumber);
 
     // Функция для поиска студента по идентификатору
     Student* findStudent(int id) const;

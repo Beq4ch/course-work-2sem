@@ -2,7 +2,11 @@
 
 // Функция для вычисления хэш-значения идентификатора студента
 unsigned int hashStudentId(int id) {
-    return id * 31;
+    unsigned int hash = 0;
+    hash = 31 * hash + (id % 1000); // Добавляем последние три цифры
+    hash = 31 * hash + ((id / 1000) % 1000); // Добавляем следующие три цифры
+    hash = 31 * hash + (id / 1000000); // Добавляем оставшиеся цифры
+    return hash;
 }
 
 // Конструктор структуры Student
@@ -35,11 +39,11 @@ unsigned int StudentHashTable::hashFunction(int id) const {
 }
 
 // Функция для добавления студента в хэш-таблицу
-void StudentHashTable::addStudent(const char* name, const int* grades, float stipend, const char* phoneNumber, int groupNumber) {
+void StudentHashTable::addStudent(int studentId, const char* name, const int* grades, float stipend, const char* phoneNumber, int groupNumber) {
     if (numElements > tableSize * 0.75) {
         resizeTable();
     }
-    Student newStudent(nextId++, name, grades, stipend, phoneNumber, groupNumber);
+    Student newStudent(studentId, name, grades, stipend, phoneNumber, groupNumber);
     unsigned int hash = hashFunction(newStudent.id);
     StudentNode* newNode = new StudentNode(newStudent);
 
@@ -230,7 +234,7 @@ void StudentHashTable::moveStudentToGroup(int id, StudentHashTable& newGroupTabl
     Student* student = findStudent(id);
     if (student) {
         // Добавляем студента в новую группу
-        newGroupTable.addStudent(student->name, student->grades, student->scholarship, student->phoneNumber, newGroupNumber);
+        newGroupTable.addStudent(student->id, student->name, student->grades, student->scholarship, student->phoneNumber, newGroupNumber);
         // Удаляем студента из текущей группы
         removeStudent(id);
         cout << "Студент с ID " << id << " перемещен в группу " << newGroupNumber << ".\n";
@@ -269,7 +273,7 @@ void StudentHashTable::loadFromFile(ifstream& inFile, int groupNumber) {
         char phoneNumber[PHONE_NUMBER_LENGTH];
         strncpy_s(phoneNumber, line, PHONE_NUMBER_LENGTH);
 
-        addStudent(studentName, grades, stipend, phoneNumber, groupNumber);
+        addStudent(id, studentName, grades, stipend, phoneNumber, groupNumber);
         if (id >= nextId) {
             nextId = id + 1;
         }
