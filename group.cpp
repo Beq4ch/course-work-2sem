@@ -28,6 +28,7 @@ void GroupNode::loadFromFile(ifstream& inFile, int groupNumber) {
 // Конструктор GroupList по умолчанию
 GroupList::GroupList() : head(nullptr), tail(nullptr) {}
 
+// Дестркутор для освобождения всех ресурсов, связанных с объектами группы
 GroupList::~GroupList() {
     removeAllGroup();
 }

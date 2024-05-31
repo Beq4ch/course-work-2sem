@@ -34,6 +34,9 @@ struct GroupList {
     // Конструктор по умолчанию
     GroupList();
 
+    // Деструктор для освобождения памяти
+    ~GroupList();
+
     // Функция для добавления новой группы
     void addGroup(int groupNumber);
 
